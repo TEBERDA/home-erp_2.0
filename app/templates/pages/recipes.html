@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Список рецептов</h3>
+                <div class="card-actions">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-recipe">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        Добавить рецепт
+                    </button>
+                </div>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for recipe in recipes %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="avatar bg-blue-lt">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 4v3m-4 -3v3m8 -3v3m-12 3h16l-1 12h-14l-1 -12z" /></svg>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <a href="/recipes/{{ recipe.id }}" class="text-reset d-block"><strong>{{ recipe.name }}</strong></a>
+                            <div class="text-muted text-truncate">{{ recipe.description or "Нет описания" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-blue-lt">{{ recipe.portions }} порц.</span>
+                        </div>
+                        <div class="col-auto">
+                            <a href="/recipes/{{ recipe.id }}" class="btn btn-sm btn-outline-primary">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item text-center py-4">
+                    <div class="text-muted">Рецептов пока нет. Добавьте свой первый рецепт!</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-recipe" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form hx-post="/ui/recipes" hx-target="body">
+                <div class="modal-header">
+                    <h5 class="modal-title">Новый рецепт</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" class="form-control" name="name" placeholder="Название рецепта" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" name="description" rows="2" placeholder="Краткое описание"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Инструкции</label>
+                        <textarea class="form-control" name="instructions" rows="5" placeholder="Как готовить?"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Количество порций</label>
+                        <input type="number" class="form-control" name="portions" value="1" min="1" step="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

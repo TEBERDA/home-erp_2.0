@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Household Settings
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-cards">
+            <!-- Household Info -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">General Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/api/v1/households/update" method="post" hx-post="/api/v1/households/update" hx-swap="none">
+                            <div class="mb-3">
+                                <label class="form-label">Household Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ household.name }}" required>
+                            </div>
+                            <div class="form-footer text-end">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Invite Link</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-secondary">Share this link with your family members to let them join your household.</p>
+                        <div class="input-group mb-2">
+                            <input type="text" id="invite-link-input" class="form-control" value="{{ request.base_url }}register?invite_code={{ household.invite_code }}" readonly>
+                            <button class="btn btn-primary" type="button" onclick="copyInviteLinkSettings()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" /></svg>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="mt-3">
+                            <form hx-post="/api/v1/households/regenerate-code" hx-target="body">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Regenerating the code will invalidate the old one. Are you sure?')">
+                                    Regenerate Invite Code
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Members</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in members %}
+                                <tr>
+                                    <td>{{ member.full_name }}</td>
+                                    <td class="text-secondary">{{ member.email }}</td>
+                                    <td>
+                                        <span class="badge bg-blue-lt">Member</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyInviteLinkSettings() {
+        const input = document.getElementById('invite-link-input');
+        input.select();
+        document.execCommand('copy');
+        showToast('Success', 'Invite link copied to clipboard!', 'success');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+<div class="card mb-3" id="chore-{{ item.chore.id }}">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="card-title mb-1">{{ item.chore.name }}</h3>
+                <div class="text-muted small">
+                    {{ item.chore.description or "Нет описания" }}
+                </div>
+                <div class="mt-2">
+                    <span class="badge {% if item.is_overdue %}bg-red{% elif item.is_due_soon %}bg-orange{% else %}bg-green{% endif %}">
+                        Срок: {{ item.next_due.strftime('%d.%m.%Y') }}
+                    </span>
+                    <span class="text-muted small ms-2">
+                        Последний раз: {{ item.last_performed.strftime('%d.%m.%Y %H:%M') if item.last_performed else "Никогда" }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button hx-post="/api/v1/chores/{{ item.chore.id }}/execute" 
+                        hx-target="#chore-{{ item.chore.id }}" 
+                        hx-swap="outerHTML"
+                        class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                    Готово
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

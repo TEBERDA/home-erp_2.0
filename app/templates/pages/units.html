@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-deck row-cards">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Справочник единиц измерения</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table card-table table-vcenter">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Описание</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if units %}
+                            {% for unit in units %}
+                            <tr>
+                                <td>
+                                    <span class="text-reset d-inline-block">{{ unit.name }}</span>
+                                </td>
+                                <td class="text-muted">{{ unit.description or "-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">Единицы не найдены.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Конвертация единиц</h3>
+                <div class="card-actions">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-conversion">
+                        Добавить правило
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table card-table table-vcenter">
+                    <thead>
+                        <tr>
+                            <th>Откуда (1 ед.)</th>
+                            <th>Множитель</th>
+                            <th>Куда</th>
+                            <th>Товар</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if conversions %}
+                            {% for c in conversions %}
+                            <tr>
+                                <td>{{ c.from_unit.name }}</td>
+                                <td>{{ c.factor }}</td>
+                                <td>{{ c.to_unit.name }}</td>
+                                <td>{{ c.product.name if c.product else "Глобально" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Правила не настроены.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-conversion" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form hx-post="/ui/units/conversions" hx-target="body">
+                <div class="modal-header">
+                    <h5 class="modal-title">Новое правило конвертации</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Из (1 ед.)</label>
+                            <select name="from_unit_id" class="form-select" required>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-center align-self-end pb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="5" y1="12" x2="19" y2="12" /><line x1="13" y1="18" x2="19" y2="12" /><line x1="13" y1="6" x2="19" y2="12" /></svg>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">В</label>
+                            <select name="to_unit_id" class="form-select" required>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Множитель (1 Откуда = X Куда)</label>
+                        <input type="number" step="0.0001" name="factor" class="form-control" placeholder="1000.0" required>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Для товара (опционально)</label>
+                        <select name="product_id" class="form-select">
+                            <option value="">-- Глобальное правило --</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

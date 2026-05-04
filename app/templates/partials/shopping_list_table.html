@@ -1,0 +1,30 @@
+<div class="table-responsive">
+    <table class="table card-table table-vcenter">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Количество</th>
+                <th>Добавлено</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if items %}
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <span class="text-reset d-inline-block">{{ item.product.name }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-blue text-white">{{ item.amount }}</span>
+                    </td>
+                    <td class="text-muted" style="font-size: 0.875rem;">{{ item.added_date.strftime('%d.%m.%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center text-muted">Список покупок пока пуст.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

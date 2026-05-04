@@ -1,0 +1,44 @@
+<div class="table-responsive">
+    <table class="table card-table table-vcenter">
+        <thead>
+            <tr>
+                <th>Продукт</th>
+                <th>Остаток</th>
+                <th>Мин. запас</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if inventory %}
+                {% for item in inventory %}
+                <tr>
+                    <td>
+                        <span class="text-truncate">
+                            <span class="text-reset d-inline-block">{{ item.product_name }}</span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-blue text-white">{{ item.total_amount }}</span>
+                    </td>
+                    <td>{{ item.min_stock_amount }}</td>
+                    <td>
+                        {% if item.has_expired_items %}
+                            <span class="badge bg-danger">Просрочен</span>
+                        {% elif item.has_expiring_soon_items %}
+                            <span class="badge bg-warning">Срок скоро</span>
+                        {% elif item.is_below_min_stock %}
+                            <span class="badge bg-orange">Ниже минимума</span>
+                        {% else %}
+                            <span class="badge bg-success">Ок</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Пока нет данных по остаткам.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,1 @@
+"""Home ERP application package."""

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Контроль аккумуляторов и батареек</h3>
+                <div class="card-actions">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-battery">
+                        Добавить АКБ
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for battery in batteries %}
+                    <div class="col-md-6 col-lg-4" id="battery-{{ battery.id }}">
+                        {% include "partials/battery_item.html" %}
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center text-muted py-4">
+                        Список пуст. Добавьте свой первый аккумулятор.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-battery" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form hx-post="/ui/batteries" hx-target="body">
+                <div class="modal-header">
+                    <h5 class="modal-title">Новый АКБ/Батарейка</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" class="form-control" name="name" placeholder="Например: Пылесос" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Тип</label>
+                        <input type="text" class="form-control" name="type" placeholder="Например: Li-Ion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Локация (где используется)</label>
+                        <select class="form-select" name="location_id">
+                            <option value="">-- Не выбрано --</option>
+                            {% for loc in locations %}
+                            <option value="{{ loc.id }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

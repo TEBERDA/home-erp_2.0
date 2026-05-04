@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<div class="page page-center">
+    <div class="container container-tight py-4">
+        <div class="text-center mb-4">
+            <a href="." class="navbar-brand navbar-brand-autodark">
+                <h1 class="display-4 fw-bold text-primary">Home ERP</h1>
+            </a>
+        </div>
+        <div class="card card-md shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <img src="https://img.icons8.com/fluency/96/home.png" alt="Home ERP Logo" style="width: 80px;">
+                </div>
+                <h2 class="card-title h1 mb-3">Manage Your Household Like a Pro</h2>
+                <p class="text-secondary mb-5 px-lg-5">
+                    Track inventory, manage recipes, coordinate chores, and maintain your equipment in one shared space for your entire family.
+                </p>
+                <div class="row g-3 justify-content-center">
+                    <div class="col-auto">
+                        <a href="/register" class="btn btn-primary btn-lg px-5 shadow-sm" style="border-radius: 8px;">
+                            Get Started
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/login" class="btn btn-outline-primary btn-lg px-5" style="border-radius: 8px;">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-light p-4 border-top">
+                <div class="row text-center g-3">
+                    <div class="col-4">
+                        <div class="fw-bold">Inventory</div>
+                        <div class="text-muted small">Real-time tracking</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold">Recipes</div>
+                        <div class="text-muted small">Smart shopping</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold">Chores</div>
+                        <div class="text-muted small">Stay organized</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-secondary mt-4">
+            Join thousands of households simplifying their life.
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Remove sidebar space if any */
+    body {
+        padding-left: 0 !important;
+    }
+    .navbar {
+        display: none !important;
+    }
+    .page-wrapper {
+        margin-left: 0 !important;
+    }
+</style>
+{% endblock %}

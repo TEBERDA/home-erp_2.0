@@ -1,0 +1,35 @@
+<tr id="product-row-{{ item.product_id }}" class="{% if success %}table-success{% endif %}">
+    <td>
+        <strong>{{ item.product_name }}</strong>
+        <div class="text-muted small">{{ item.unit_name }}</div>
+    </td>
+    <td class="text-center">
+        <span class="badge bg-blue-lt fs-3">{{ item.total_amount }}</span>
+    </td>
+    <td>
+        <div class="input-group">
+            <input type="number" 
+                   step="0.01" 
+                   name="amount" 
+                   value="{{ item.total_amount }}" 
+                   class="form-control form-control-lg"
+                   hx-post="/api/v1/inventory/audit"
+                   hx-vals='{"product_id": {{ item.product_id }}}'
+                   hx-trigger="keyup[key=='Enter']"
+                   hx-target="closest tr"
+                   hx-swap="outerHTML">
+            <button class="btn btn-primary btn-lg"
+                    hx-post="/api/v1/inventory/audit"
+                    hx-vals='{"product_id": {{ item.product_id }}}'
+                    hx-include="closest tr find input"
+                    hx-target="closest tr"
+                    hx-swap="outerHTML">
+                {% if success %}
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                {% else %}
+                Обновить
+                {% endif %}
+            </button>
+        </div>
+    </td>
+</tr>

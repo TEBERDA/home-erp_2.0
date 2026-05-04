@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-cards">
+    {% for location, items in grouped_inventory.items() %}
+    <div class="col-12">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">{{ location }}</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Продукт</th>
+                            <th class="text-center">Системный остаток</th>
+                            <th style="width: 300px;">Фактический остаток</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        {% include "partials/audit_row.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Нет продуктов для инвентаризации.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

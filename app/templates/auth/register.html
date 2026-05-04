@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<div class="page page-center">
+    <div class="container container-tight py-4">
+        <div class="text-center mb-4">
+            <a href="/" class="navbar-brand navbar-brand-autodark">
+                <h2 class="fw-bold text-primary">Home ERP</h2>
+            </a>
+        </div>
+        <div class="card card-md shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Create your account</h2>
+                <form action="/api/v1/auth/register" method="post" autocomplete="off" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email address</label>
+                        <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Create a password" required>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div id="household-options">
+                        <div class="mb-3">
+                            <label class="form-label">Choose your path</label>
+                            <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                                <label class="form-selectgroup-item flex-fill">
+                                    <input type="radio" name="path" value="create" class="form-selectgroup-input" {{ 'checked' if not invite_code else '' }} onchange="togglePath('create')">
+                                    <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                        <span class="me-3">
+                                            <span class="form-selectgroup-check"></span>
+                                        </span>
+                                        <span class="form-selectgroup-label-content">
+                                            <span class="form-selectgroup-title strong mb-1">Create New Household</span>
+                                            <span class="d-block text-secondary">Start a fresh shared space for your family.</span>
+                                        </span>
+                                    </span>
+                                </label>
+                                <label class="form-selectgroup-item flex-fill mt-2">
+                                    <input type="radio" name="path" value="join" class="form-selectgroup-input" {{ 'checked' if invite_code else '' }} onchange="togglePath('join')">
+                                    <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                        <span class="me-3">
+                                            <span class="form-selectgroup-check"></span>
+                                        </span>
+                                        <span class="form-selectgroup-label-content">
+                                            <span class="form-selectgroup-title strong mb-1">Join Existing Household</span>
+                                            <span class="d-block text-secondary">Enter an invite code to join your family.</span>
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="create-field" class="mb-3 {{ 'd-none' if invite_code else '' }}">
+                            <label class="form-label">Household Name</label>
+                            <input type="text" name="household_name" class="form-control" placeholder="e.g. My Sweet Home">
+                        </div>
+
+                        <div id="join-field" class="mb-3 {{ '' if invite_code else 'd-none' }}">
+                            <label class="form-label">Invite Code</label>
+                            <input type="text" name="invite_code" class="form-control" placeholder="Enter code" value="{{ invite_code }}">
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary w-100">Create account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center text-secondary mt-3">
+            Already have account? <a href="/login" tabindex="-1">Sign in</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePath(path) {
+        if (path === 'create') {
+            document.getElementById('create-field').classList.remove('d-none');
+            document.getElementById('join-field').classList.add('d-none');
+        } else {
+            document.getElementById('create-field').classList.add('d-none');
+            document.getElementById('join-field').classList.remove('d-none');
+        }
+    }
+</script>
+
+<style>
+    body { padding-left: 0 !important; }
+    .navbar { display: none !important; }
+    .page-wrapper { margin-left: 0 !important; }
+</style>
+{% endblock %}

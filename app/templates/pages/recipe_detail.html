@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-cards">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">Инструкции (на {{ recipe.portions }} порц.)</h3>
+            </div>
+            <div class="card-body">
+                <div class="markdown">
+                    {{ recipe.instructions or "Инструкции не добавлены." }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ингредиенты</h3>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-ingredient">
+                        Добавить ингредиент
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Продукт</th>
+                            <th>Нужно</th>
+                            <th>В наличии</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in fulfillment.ingredients_status %}
+                        <tr class="{% if not item.has_enough %}bg-red-lt{% endif %}">
+                            <td>{{ item.product_name }}</td>
+                            <td>{{ item.amount_required }}</td>
+                            <td>{{ item.current_stock }}</td>
+                            <td>
+                                {% if item.has_enough %}
+                                <span class="badge bg-green">Достаточно</span>
+                                {% else %}
+                                <span class="badge bg-red">Не хватает {{ item.missing_amount }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer d-flex align-items-center">
+                {% if fulfillment.can_cook %}
+                <button hx-post="/api/v1/recipes/{{ recipe.id }}/cook" 
+                        hx-confirm="Вы уверены, что хотите списать ингредиенты и приготовить это блюдо?"
+                        hx-swap="none"
+                        class="btn btn-success w-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tools-kitchen-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12zm0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" /></svg>
+                    Приготовить (Списать продукты)
+                </button>
+                {% else %}
+                <button hx-post="/api/v1/recipes/{{ recipe.id }}/add-missing-to-list" 
+                        hx-swap="none"
+                        class="btn btn-warning w-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l6.005 .429m7.138 6.573l-.143 .507h-13" /><path d="M15 6h6m-3 -3v6" /></svg>
+                    Добавить недостающее в список покупок
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Общая информация</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Описание</label>
+                    <div>{{ recipe.description or "Нет описания" }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Порции</label>
+                    <div>{{ recipe.portions }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-ingredient" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form hx-post="/ui/recipes/{{ recipe.id }}/ingredients" hx-target="body">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить ингредиент</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Продукт</label>
+                        <select class="form-select" name="product_id" required
+                                hx-get="/ui/partials/units-for-product" 
+                                hx-target="#recipe-unit-container">
+                            <option value="">Выберите...</option>
+                            {% for p in products %}
+                            <option value="{{ p.id }}">{{ p.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3" id="recipe-unit-container">
+                        <label class="form-label">Единица</label>
+                        <select class="form-select" name="unit_id" disabled>
+                            <option value="">--</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Количество</label>
+                        <input type="number" class="form-control" name="amount" min="0" step="0.001" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('inventoryChanged', function() {
+        window.location.reload();
+    });
+    document.body.addEventListener('shoppingListChanged', function() {
+        // Maybe show a toast? For now just reload to see status change if any
+        alert("Недостающие продукты добавлены в список покупок!");
+    });
+</script>
+{% endblock %}

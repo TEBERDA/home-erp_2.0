@@ -1,0 +1,21 @@
+from pydantic import BaseModel, ConfigDict
+
+
+class LocationBase(BaseModel):
+    name: str
+    description: str | None = None
+
+
+class LocationCreate(LocationBase):
+    pass
+
+
+class LocationUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+
+
+class LocationRead(LocationBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int

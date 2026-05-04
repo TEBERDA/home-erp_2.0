@@ -1,0 +1,6 @@
+<label class="form-label">Единица</label>
+<select name="unit_id" class="form-select" required>
+    {% for unit in units %}
+    <option value="{{ unit.id }}">{{ unit.name }}</option>
+    {% endfor %}
+</select>

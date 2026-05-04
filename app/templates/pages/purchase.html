@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-deck row-cards">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Добавить товар в запас</h3>
+            </div>
+            <div class="card-body">
+                <form hx-post="/ui/purchase" hx-target="#inventory-table" hx-swap="innerHTML">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Товар</label>
+                            <select name="product_id" class="form-select" required
+                                    hx-get="/ui/partials/units-for-product" 
+                                    hx-target="#unit-select-container">
+                                <option value="">-- Выберите товар --</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2" id="unit-select-container">
+                            <label class="form-label">Единица</label>
+                            <select name="unit_id" class="form-select" disabled>
+                                <option value="">--</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Количество</label>
+                            <input type="number" step="0.01" min="0.01" name="amount" class="form-control" placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Общая стоимость (RUB)</label>
+                            <input type="number" step="0.01" min="0" name="price" class="form-control" placeholder="0.00">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Магазин</label>
+                            <select name="store_id" class="form-select">
+                                <option value="">-- Выберите магазин --</option>
+                                {% for store in stores %}
+                                <option value="{{ store.id }}">{{ store.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Или новый магазин</label>
+                            <input type="text" name="store_name" class="form-control" placeholder="Название магазина">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Срок истечения</label>
+                            <input type="date" name="expiry_date" class="form-control">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Добавить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Текущие остатки</h3>
+            </div>
+            <div id="inventory-table">
+                {% include "partials/inventory_table.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

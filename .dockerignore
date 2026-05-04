@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.cursor/
+.idea/
+.vscode/
+home_erp.egg-info/
+*.log

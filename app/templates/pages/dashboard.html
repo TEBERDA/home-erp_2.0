@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row row-deck row-cards">
+    <!-- Summary Cards -->
+    <div class="col-sm-4 col-lg">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-truncate">
+                    <h3 class="card-title">
+                        Всего товаров
+                    </h3>
+                    <div class="h1 mb-0">{{ inventory|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-lg">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-truncate">
+                    <h3 class="card-title">
+                        Ниже минимума
+                    </h3>
+                    <div class="h1 mb-0 text-danger">{{ inventory|selectattr('is_below_min_stock', 'equalto', True)|list|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-lg">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-truncate">
+                    <h3 class="card-title">
+                        Скоро истекает
+                    </h3>
+                    <div class="h1 mb-0 text-warning">{{ inventory|selectattr('has_expiring_soon_items', 'equalto', True)|list|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-lg">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-truncate">
+                    <h3 class="card-title">
+                        Истекший срок
+                    </h3>
+                    <div class="h1 mb-0 text-danger">{{ inventory|selectattr('has_expired_items', 'equalto', True)|list|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4 col-lg">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-truncate">
+                    <h3 class="card-title">
+                        Ценность запаса
+                    </h3>
+                    <div class="h1 mb-0 text-green">{{ "%.2f"|format(total_value) }} ₽</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Chores Due Widget -->
+    <div class="col-md-6">
+        <div class="card card-md h-100">
+            <div class="card-header">
+                <h3 class="card-title">Дела, требующие внимания</h3>
+                <div class="card-actions">
+                    <a href="/chores" class="btn btn-sm btn-ghost-primary">Все дела</a>
+                </div>
+            </div>
+            <div class="list-group list-group-flush list-group-hoverable">
+                {% for item in due_chores %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="badge {% if item.is_overdue %}bg-red{% else %}bg-orange{% endif %} badge-dot"></span>
+                        </div>
+                        <div class="col text-truncate">
+                            <a href="/chores" class="text-reset d-block">{{ item.chore.name }}</a>
+                            <div class="d-block text-muted text-truncate mt-n1">
+                                Срок: {{ item.next_due.strftime('%d.%m.%Y') }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button hx-post="/api/v1/chores/{{ item.chore.id }}/execute" 
+                                    hx-on::after-request="if(event.detail.successful) window.location.reload()"
+                                    class="btn btn-sm btn-outline-primary">
+                                Готово
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item text-center text-muted py-4">
+                    Нет срочных дел
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Widget -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="card-title">Последние события</h3>
+            </div>
+            <div class="list-group list-group-flush list-group-hoverable" style="max-height: 400px; overflow-y: auto;">
+                {% for log in recent_activity %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="avatar avatar-sm rounded">{{ log.user.full_name[:1] }}</span>
+                        </div>
+                        <div class="col text-truncate">
+                            <div class="text-reset d-block">{{ log.description }}</div>
+                            <div class="d-block text-muted text-truncate mt-n1">
+                                {{ log.user.full_name }} • {{ log.created_at.strftime('%H:%M %d.%m') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item text-center text-muted py-4">
+                    Событий пока нет
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Stock Table -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Текущие остатки</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table card-table table-vcenter">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Единица</th>
+                        <th>Мин. остаток</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if inventory %}
+                        {% for item in inventory %}
+                        <tr>
+                            <td>{{ item.product_name }}</td>
+                            <td><span class="badge bg-blue text-white">{{ item.total_amount }}</span></td>
+                            <td class="text-muted">шт</td>
+                            <td>{{ item.min_stock_amount }}</td>
+                            <td>
+                                {% if item.has_expired_items %}
+                                    <span class="badge bg-danger">Истек срок</span>
+                                {% elif item.is_below_min_stock %}
+                                    <span class="badge bg-danger">Ниже минимума</span>
+                                {% elif item.has_expiring_soon_items %}
+                                    <span class="badge bg-warning">Скоро истекает</span>
+                                {% else %}
+                                    <span class="badge bg-success">OK</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Нет товаров</td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Below Min Stock Alert -->
+    {% set below_min = inventory|selectattr('is_below_min_stock', 'equalto', True)|list %}
+    {% if below_min %}
+    <div class="col-12">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                    <h3>Внимание: товары ниже минимального остатка</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="mt-3">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Текущий остаток</th>
+                        <th>Минимальный остаток</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in below_min %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.total_amount }}</td>
+                        <td>{{ item.min_stock_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Expiring Soon Alert -->
+    {% set expiring_soon = inventory|selectattr('has_expiring_soon_items', 'equalto', True)|list %}
+    {% if expiring_soon %}
+    <div class="col-12">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9" /></svg>
+                    <h3>Внимание: товары скоро истекают</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="mt-3">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in expiring_soon %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.total_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Expired Alert -->
+    {% set expired = inventory|selectattr('has_expired_items', 'equalto', True)|list %}
+    {% if expired %}
+    <div class="col-12">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9" /><path d="M9 12h6" /><path d="M12 9v6" /></svg>
+                    <h3>КРИТИЧНО: товары с истекшим сроком</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="mt-3">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in expired %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.total_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Maintenance & Battery Alerts -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Обслуживание техники</h3>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for alert in maintenance_alerts %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col text-truncate">
+                            <a href="/equipment/{{ alert.task.equipment_id }}" class="text-reset d-block">{{ alert.task.name }}</a>
+                            <div class="d-block text-muted text-truncate mt-n1">
+                                {{ alert.task.equipment.name }} • Срок: {{ alert.next_due.strftime('%d.%m.%Y') }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge {% if alert.is_overdue %}bg-red{% else %}bg-orange{% endif %}"></span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item text-center text-muted">Задач нет</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Батарейки (проверка)</h3>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for b in battery_alerts %}
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col text-truncate">
+                            <a href="/batteries" class="text-reset d-block">{{ b.name }}</a>
+                            <div class="d-block text-muted text-truncate mt-n1">
+                                {{ b.type }} • Последняя зарядка: {{ b.last_charge_date.strftime('%d.%m.%Y') if b.last_charge_date else "Никогда" }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-yellow"></span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item text-center text-muted">Все в порядке</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

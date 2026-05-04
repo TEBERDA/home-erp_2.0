@@ -1,0 +1,25 @@
+[project]
+name = "home-erp"
+version = "0.1.0"
+description = "Self-hosted household inventory and shopping management"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic",
+    "fastapi",
+    "jinja2",
+    "pydantic-settings",
+    "psycopg2-binary",
+    "python-multipart",
+    "sqlalchemy",
+    "uvicorn[standard]",
+    "passlib[bcrypt]",
+    "python-jose[cryptography]",
+]
+
+[build-system]
+requires = ["setuptools>=68.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
