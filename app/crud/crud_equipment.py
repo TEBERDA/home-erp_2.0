@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.equipment import Equipment, Battery, MaintenanceTask, EquipmentDocument
@@ -70,7 +70,7 @@ def execute_maintenance(db: Session, household_id: int, task_id: int) -> Mainten
     
     if not task:
         raise ValueError("Task not found")
-    task.last_done_date = datetime.utcnow()
+    task.last_done_date = datetime.now(timezone.utc)
     db.commit()
     db.refresh(task)
     return task
@@ -101,7 +101,7 @@ def charge_battery(db: Session, household_id: int, battery_id: int) -> Battery:
     
     if not b:
         raise ValueError("Battery not found")
-    b.last_charge_date = datetime.utcnow()
+    b.last_charge_date = datetime.now(timezone.utc)
     b.charge_cycles += 1
     db.commit()
     db.refresh(b)
@@ -116,11 +116,11 @@ def get_maintenance_alerts(db: Session, household_id: int) -> list[dict]:
     alerts = []
     for t in tasks:
         next_due = (t.last_done_date or datetime.min) + timedelta(days=t.period_days)
-        if next_due < (datetime.utcnow() + timedelta(days=3)):
+        if next_due < (datetime.now(timezone.utc) + timedelta(days=3)):
             alerts.append({
                 "task": t,
                 "next_due": next_due,
-                "is_overdue": next_due < datetime.utcnow()
+                "is_overdue": next_due < datetime.now(timezone.utc)
             })
     return alerts
 
@@ -130,6 +130,6 @@ def get_battery_alerts(db: Session, household_id: int) -> list[dict]:
     alerts = []
     for b in batteries:
         # If not charged for more than 30 days (default threshold)
-        if not b.last_charge_date or (datetime.utcnow() - b.last_charge_date).days > 30:
+        if not b.last_charge_date or (datetime.now(timezone.utc) - b.last_charge_date).days > 30:
             alerts.append(b)
     return alerts

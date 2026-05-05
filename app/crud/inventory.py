@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import Select, case, func, nulls_last, select
 from sqlalchemy.orm import Session
 
@@ -28,7 +28,7 @@ def purchase_stock(db: Session, household_id: int, payload: InventoryPurchaseReq
         product_id=payload.product_id,
         amount=payload.amount,
         expiry_date=payload.expiry_date,
-        added_date=payload.added_date or datetime.utcnow(),
+        added_date=payload.added_date or datetime.now(timezone.utc),
         price=payload.price,
         store_id=store_id,
         currency=payload.currency,
@@ -119,7 +119,7 @@ def adjust_inventory(db: Session, household_id: int, payload: InventoryAdjustmen
                 product_id=payload.product_id,
                 amount=payload.amount,
                 expiry_date=payload.expiry_date,
-                added_date=datetime.utcnow(),
+                added_date=datetime.now(timezone.utc),
                 household_id=household_id
             )
         )

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from app.models.chore import Chore, ChoreLog
@@ -32,14 +32,14 @@ def get_chores_with_due_date(db: Session, household_id: int) -> list[dict]:
         if last_performed:
             next_due = last_performed + timedelta(days=chore.period_days)
         else:
-            next_due = datetime.utcnow() # Due now if never performed
+            next_due = datetime.now(timezone.utc) # Due now if never performed
             
         result.append({
             "chore": chore,
             "last_performed": last_performed,
             "next_due": next_due,
-            "is_overdue": next_due < datetime.utcnow(),
-            "is_due_soon": next_due < (datetime.utcnow() + timedelta(days=1))
+            "is_overdue": next_due < datetime.now(timezone.utc),
+            "is_due_soon": next_due < (datetime.now(timezone.utc) + timedelta(days=1))
         })
         
     return result
@@ -73,7 +73,7 @@ def execute_chore(db: Session, household_id: int, chore_id: int, acting_user=Non
         
     try:
         # 1. Create log
-        log = ChoreLog(chore_id=chore.id, performed_at=datetime.utcnow(), household_id=household_id)
+        log = ChoreLog(chore_id=chore.id, performed_at=datetime.now(timezone.utc), household_id=household_id)
         db.add(log)
         
         # 2. Inventory Integration

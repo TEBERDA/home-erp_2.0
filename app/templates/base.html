@@ -1,15 +1,19 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>{{ title or "Home ERP" }} - Home ERP</title>
-    <!-- Tabler UI (Bootstrap 5) -->
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/iconfont/tabler-icons.min.css" rel="stylesheet"/>
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <!-- Tabler UI v1.4.0 (Bootstrap 5.3 base, CSS variables dark mode) -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css" rel="stylesheet"/>
+    <!-- Tabler Icons v3.42.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.42.0/dist/tabler-icons.min.css" rel="stylesheet"/>
+    <!-- HTMX 2.0.4 -->
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx-ext-json-enc@2.0.1/json-enc.js" defer></script>
+    <!-- Chart.js 4.5.1 (stable, no v5 yet as of May 2026) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" defer></script>
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}">
 </head>
@@ -193,8 +197,8 @@
         </div>
     </div>
 
-    <!-- Tabler Core JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core/dist/js/tabler.min.js"></script>
+    <!-- Tabler Core JS v1.4.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
     <!-- App JS -->
     <script src="{{ url_for('static', path='js/app.js') }}"></script>
     <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>

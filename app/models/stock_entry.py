@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from sqlalchemy import Date, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,7 +19,7 @@ class StockEntry(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    added_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    added_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
     
     # Financial fields

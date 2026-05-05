@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import DateTime, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -11,7 +11,7 @@ class ShoppingListItem(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    added_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    added_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     
     household_id: Mapped[int] = mapped_column(ForeignKey("households.id"), nullable=False, index=True)
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,7 +29,7 @@ class ChoreLog(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     chore_id: Mapped[int] = mapped_column(ForeignKey("chores.id"), nullable=False)
-    performed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    performed_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     household_id: Mapped[int] = mapped_column(ForeignKey("households.id"), nullable=False, index=True)
 

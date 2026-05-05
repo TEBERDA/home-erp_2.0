@@ -1,10 +1,12 @@
 from pydantic import BaseModel, ConfigDict
 
+type Portions = int
+type IngredientAmount = float
 
 class RecipeIngredientBase(BaseModel):
     product_id: int
     unit_id: int | None = None
-    amount: float
+    amount: IngredientAmount
 
 
 class RecipeIngredientCreate(RecipeIngredientBase):
@@ -14,7 +16,7 @@ class RecipeIngredientCreate(RecipeIngredientBase):
 class RecipeIngredientUpdate(BaseModel):
     product_id: int | None = None
     unit_id: int | None = None
-    amount: float | None = None
+    amount: IngredientAmount | None = None
 
 
 class RecipeIngredientRead(RecipeIngredientBase):
@@ -28,7 +30,7 @@ class RecipeBase(BaseModel):
     name: str
     description: str | None = None
     instructions: str | None = None
-    portions: int = 1
+    portions: Portions = 1
 
 
 class RecipeCreate(RecipeBase):
@@ -39,7 +41,7 @@ class RecipeUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
     instructions: str | None = None
-    portions: int | None = None
+    portions: Portions | None = None
     ingredients: list[RecipeIngredientCreate] | None = None
 
 
@@ -53,9 +55,9 @@ class RecipeRead(RecipeBase):
 class IngredientFulfillmentStatus(BaseModel):
     product_id: int
     product_name: str
-    amount_required: float
+    amount_required: IngredientAmount
     current_stock: float
-    missing_amount: float
+    missing_amount: IngredientAmount
     has_enough: bool
 
 

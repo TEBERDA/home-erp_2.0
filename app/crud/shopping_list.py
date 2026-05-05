@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,7 @@ def add_shopping_item(db: Session, household_id: int, payload: ShoppingListItemC
     item = ShoppingListItem(
         product_id=payload.product_id,
         amount=payload.amount,
-        added_date=datetime.utcnow(),
+        added_date=datetime.now(timezone.utc),
         household_id=household_id
     )
     db.add(item)
@@ -76,7 +76,7 @@ def auto_generate_shopping_list(db: Session, household_id: int) -> int:
                     ShoppingListItem(
                         product_id=row.id,
                         amount=missing_amount,
-                        added_date=datetime.utcnow(),
+                        added_date=datetime.now(timezone.utc),
                         household_id=household_id
                     )
                 )
