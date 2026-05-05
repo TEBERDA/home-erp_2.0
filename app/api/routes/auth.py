@@ -18,6 +18,10 @@ def register(
     invite_code: str = Form(default=""),
     db: Session = Depends(get_db)
 ):
+    # Bcrypt has a 72-byte limit
+    if len(password.encode('utf-8')) > 72:
+        raise HTTPException(status_code=400, detail="Password must be less than 72 bytes")
+
     # Check if user exists
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")

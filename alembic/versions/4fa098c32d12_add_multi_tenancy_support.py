@@ -31,6 +31,8 @@ def upgrade() -> None:
     
     # 2. Insert Default Household
     op.execute("INSERT INTO households (id, name, invite_code) VALUES (1, 'Default Household', 'default-invite-code')")
+    # Sync sequence after manual ID insert
+    op.execute("SELECT setval('households_id_seq', (SELECT MAX(id) FROM households))")
 
     # 3. Create users table
     op.create_table('users',
