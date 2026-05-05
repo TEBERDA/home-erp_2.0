@@ -15,6 +15,7 @@ dependencies = [
     "uvicorn[standard]",
     "passlib[bcrypt]",
     "python-jose[cryptography]",
+    "httpx",
 ]
 
 [build-system]

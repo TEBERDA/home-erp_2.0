@@ -3,7 +3,7 @@ from typing import Any, Union
 
 from jose import jwt
 from passlib.context import CryptContext
-from fastapi import Request, HTTPException, status
+from fastapi import Request, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from app.models.auth import User
 from app.db.session import get_db
@@ -65,5 +65,3 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
         )
     return user
 
-# Helper to use in Depends
-from fastapi import Depends
